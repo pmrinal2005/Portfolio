@@ -10,63 +10,52 @@ declare global {
 }
 
 /* ------------------------------------------------------------------ */
-/* Timeline constants (2.1 s, one Web Animations timeline)             */
+/* Timeline (one Web Animations timeline, every property keyed on the   */
+/* same offsets so the whole reveal stays in sync)                      */
 /* ------------------------------------------------------------------ */
-const DUR = 2100;
+const DUR = 2600;
 const EASE_A = "cubic-bezier(.5,0,.3,1)";
 const EASE_B = "cubic-bezier(.45,0,.3,1)";
 const EASE_C = "cubic-bezier(.4,0,.2,1)";
-const EASE_NAV = "cubic-bezier(.2,.8,.2,1)";
 
-/* Phone geometry: pill = full width (100vw - 40px), final height = width / 1.85 */
-const PH_FINAL = "((100vw - 40px) / 1.85)";
+/* keyframe offsets */
+const OFF = [0, 0.12, 0.4, 0.72, 1];
+const EASES = [EASE_A, EASE_B, EASE_C, EASE_C, EASE_C];
+/* progress of the pill WIDTH / HEIGHT at each offset (0 = the "O", 1 = fully open) */
+const P_W = [0, 0, 0.38, 0.86, 1];
+const P_H = [0, 0, 0.35, 0.8, 1];
+/* ring thickness left around the video (1 = ring of the letter, 0 = no ring) */
+const RING = [1, 1, 0.7, 0.12, 0];
+/* phone only: PR / JECTS leave the line early so the growing pill never covers them */
+const P_Y = [0, 0, 0.85, 1, 1];
+const P_X = [0, 0, 0.5, 0.9, 1];
 
-/* ------------------------------------------------------------------ */
-/* Background strokes: 15 long white S-curves sweeping up and right    */
-/* ------------------------------------------------------------------ */
-const STROKES = Array.from({ length: 15 }, (_, i) => {
-  const y0 = 930 - i * 54 + Math.sin(i * 1.7) * 26;
-  const d1 = 70 + Math.sin(i * 0.9) * 60;
-  const d2 = 300 + Math.cos(i * 1.3) * 90;
-  const d3 = 460 + Math.sin(i * 2.1) * 110;
-  const d4 = 420 + Math.cos(i * 0.7) * 120;
-  const r = (n: number) => Math.round(n);
-  return {
-    d: `M -120 ${r(y0)} C 280 ${r(y0 + d1)}, 520 ${r(y0 - d2)}, 820 ${r(y0 - d2 * 0.85)} S 1200 ${r(y0 - d3)}, 1580 ${r(y0 - d4)}`,
-    width: +(1.2 + (((i * 7) % 13) / 12) * 2.7).toFixed(2), // 1.2 – 3.9 px
-    opacity: +(0.55 + (((i * 5) % 7) / 6) * 0.3).toFixed(2), // 0.55 – 0.85
-  };
-});
-
-type Group = Animation[];
+const lerp = (a: string, b: string, p: number) =>
+  p === 0 ? a : p === 1 ? b : `calc(${a} * ${(1 - p).toFixed(3)} + ${b} * ${p.toFixed(3)})`;
 
 export default function PillHero() {
   const rootRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLSpanElement>(null);
+  const rightRef = useRef<HTMLSpanElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const paperRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const footRef = useRef<HTMLDivElement>(null);
-  const ruleRef = useRef<HTMLDivElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
   const iconsRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const replayRef = useRef<() => void>(() => {});
   const [waves, setWaves] = useState(true);
 
   useEffect(() => {
     const root = rootRef.current!;
     const vid = videoRef.current!;
-    const mqPhone = window.matchMedia("(max-width: 720px)");
+    const mqPhone = window.matchMedia("(max-width: 860px)");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const rec = new URLSearchParams(window.location.search).get("rec") === "1";
 
     let disposed = false;
     let phone = mqPhone.matches;
     let revealed = false;
-    let busy = false;
-    let token = 0; // bumped by resize / new replay to cancel pending chains
-    let anims: Group = [];
+    let token = 0; // bumped by resize / collapse to cancel pending chains
+    let anims: Animation[] = [];
     const timers: number[] = [];
 
     vid.muted = true;
@@ -92,6 +81,7 @@ export default function PillHero() {
     /* ---------------- keyframes ---------------- */
     const build = () => {
       anims.forEach((a) => a.cancel());
+
       const mk = (el: Element | null, kf: Keyframe[]) => {
         if (!el) return null;
         const a = el.animate(kf, { duration: DUR, fill: "both", easing: "linear" });
@@ -100,82 +90,65 @@ export default function PillHero() {
         return a;
       };
 
-      const gap = phone
-        ? ["0.03em", "0.03em", "0.06em", "0.1em"]
-        : ["0.026em", "0.026em", "0.05em", "0.085em"];
+      /* all sizes come from CSS custom properties, so they follow the viewport live */
+      const size = (a: string, b: string, p: number) => lerp(a, b, p);
 
-      const pill: Keyframe[] = phone
-        ? [
-            { height: "1.5px", offset: 0 },
-            { height: "1.5px", offset: 0.14, easing: EASE_A },
-            { height: `calc(${PH_FINAL} * 0.1)`, offset: 0.3, easing: EASE_B },
-            { height: `calc(${PH_FINAL} * 0.55)`, offset: 0.58, easing: EASE_C },
-            { height: `calc(${PH_FINAL})`, offset: 1 },
-          ]
-        : [
-            { width: "0.012em", offset: 0 },
-            { width: "0.012em", offset: 0.14, easing: EASE_A },
-            { width: "0.16em", offset: 0.3, easing: EASE_B },
-            { width: "1.81em", offset: 0.58, easing: EASE_C },
-            { width: "3.62em", offset: 1 },
-          ];
+      const pill: Keyframe[] = OFF.map((offset, i) => {
+        const kf: Keyframe = {
+          offset,
+          easing: EASES[i],
+          width: size("var(--o-w)", "var(--pill-w)", P_W[i]),
+          height: size("var(--o-h)", "var(--pill-h)", P_H[i]),
+        };
+        if (phone) {
+          kf.transform = `translate(calc(-50% + ${lerp("var(--x-pill0)", "0px", P_X[i])}), -50%)`;
+        }
+        return kf;
+      });
 
-      const clip: Keyframe[] = [
-        { clipPath: phone ? "inset(0% 50%)" : "inset(50% 0%)", offset: 0, easing: EASE_C },
-        { clipPath: "inset(0% 0%)", offset: 0.14 },
-        { clipPath: "inset(0% 0%)", offset: 1 },
-      ];
+      /* the bold ring of the "O" thins away while the video window grows to fill the pill */
+      const win: Keyframe[] = OFF.map((offset, i) => ({
+        offset,
+        easing: EASES[i],
+        clipPath: `inset(calc(var(--ring-y) * ${RING[i]}) calc(var(--ring-x) * ${RING[i]}) round 999px)`,
+      }));
 
-      const list = [
+      const list: (Animation | null)[] = [
         mk(pillRef.current, pill),
-        mk(pillRef.current, clip),
-        // hairline overlay fades 14% -> 30% (never the video itself)
-        mk(lineRef.current, [
-          { opacity: 1, offset: 0 },
-          { opacity: 1, offset: 0.14, easing: "ease" },
-          { opacity: 0, offset: 0.3 },
-          { opacity: 0, offset: 1 },
-        ]),
-        mk(heroRef.current, [
-          { gap: gap[0], offset: 0 },
-          { gap: gap[1], offset: 0.14, easing: EASE_B },
-          { gap: gap[2], offset: 0.58, easing: EASE_C },
-          { gap: gap[3], offset: 1 },
-        ]),
-        mk(paperRef.current, [
-          { opacity: 0, offset: 0 },
-          { opacity: 0, offset: 0.45, easing: EASE_C },
-          { opacity: 1, offset: 0.78 },
-          { opacity: 1, offset: 1 },
-        ]),
-        mk(navRef.current, [
-          { transform: "translateY(-140%)", offset: 0 },
-          { transform: "translateY(-140%)", offset: 0.5, easing: EASE_NAV },
-          { transform: "translateY(0%)", offset: 0.86 },
-          { transform: "translateY(0%)", offset: 1 },
-        ]),
-        mk(footRef.current, [
-          { transform: "translateY(160%)", offset: 0 },
-          { transform: "translateY(160%)", offset: 0.52, easing: EASE_NAV },
-          { transform: "translateY(0%)", offset: 0.9 },
-          { transform: "translateY(0%)", offset: 1 },
-        ]),
-        mk(ruleRef.current, [
-          { transform: "scaleX(0)", offset: 0 },
-          { transform: "scaleX(0)", offset: 0.4, easing: EASE_C },
-          { transform: "scaleX(1)", offset: 0.95 },
-          { transform: "scaleX(1)", offset: 1 },
-        ]),
+        mk(windowRef.current, win),
         mk(iconsRef.current, [
           { opacity: 0, offset: 0 },
           { opacity: 0, offset: 0.8, easing: "ease-out" },
-          { opacity: 0.85, offset: 1 },
+          { opacity: 0.9, offset: 1 },
         ]),
       ];
+
+      if (phone) {
+        /* stacked: PR slides up, JECTS slides down around the opening pill */
+        const part = (x0: string, x1: string, y1: string): Keyframe[] =>
+          OFF.map((offset, i) => ({
+            offset,
+            easing: EASES[i],
+            transform: `translate(calc(-50% + ${lerp(x0, x1, P_Y[i])}), calc(-50% + ${lerp("0px", y1, P_Y[i])}))`,
+          }));
+        list.push(
+          mk(leftRef.current, part("var(--x-pr0)", "var(--x-pr1)", "var(--y-pr1)")),
+          mk(rightRef.current, part("var(--x-j0)", "var(--x-j1)", "var(--y-j1)"))
+        );
+      } else {
+        /* inline: the row stays centred and PR / JECTS are pushed apart by the opening pill */
+        list.push(
+          mk(heroRef.current, [
+            { gap: "0.03em", offset: 0 },
+            { gap: "0.03em", offset: 0.12, easing: EASE_B },
+            { gap: "0.07em", offset: 1 },
+          ])
+        );
+      }
       anims = list.filter((a): a is Animation => a !== null);
     };
 
-    // finish every animation forwards: pill width / clip / chrome land on the final state
+    // finish every animation forwards: pill / ring / text land on the final state
     const jumpToEnd = () =>
       anims.forEach((a) => {
         a.playbackRate = 1;
@@ -198,7 +171,7 @@ export default function PillHero() {
       }
     };
 
-    /* same timeline, played in reverse */
+    /* same timeline, played in reverse (recording mode only) */
     const close = async () => {
       if (!anims.length) return false;
       anims.forEach((a) => {
@@ -214,39 +187,25 @@ export default function PillHero() {
       }
     };
 
-    const replay = async () => {
-      if (busy) return;
-      busy = true;
-      const my = ++token;
-      const closed = await close();
-      if (closed && !disposed && my === token) await open();
-      if (my === token) busy = false;
-    };
-    replayRef.current = replay;
-
     build();
 
-    /* ---------------- start: once fonts are ready (and the hero is on screen) ---------------- */
+    /* ---------------- start: once fonts are ready (and the section is on screen) ---------------- */
     const start = () => {
       if (revealed) return;
       revealed = true;
       const go = () => {
         if (disposed) return;
-        busy = true;
-        open().then(() => {
-          busy = false;
-        });
+        open();
         if (rec) {
-          // reference loop: reverse collapse starts at 4.9 s
+          // reference loop: reverse collapse starts at 5.4 s
           timers.push(
             window.setTimeout(() => {
               if (disposed) return;
-              busy = true;
               const my = ++token;
               close().then(() => {
-                if (my === token) busy = false;
+                if (my === token) token++;
               });
-            }, 4900)
+            }, 5400)
           );
         }
       };
@@ -258,7 +217,7 @@ export default function PillHero() {
     let vio: IntersectionObserver | null = null;
 
     if (rec) {
-      // Recording mode: bring the hero on screen, play at 0 s, frame-by-frame video seeking
+      // Recording mode: bring the section on screen, play at 0 s, frame-by-frame video seeking
       vid.pause();
       vid.removeAttribute("autoplay");
       window.scrollTo(0, root.offsetTop);
@@ -271,11 +230,11 @@ export default function PillHero() {
             io?.disconnect();
           }
         },
-        { threshold: 0.55 }
+        { threshold: 0.25 }
       );
       io.observe(root);
 
-      // play the looping clip only while the hero is on screen
+      // play the looping clip only while the section is on screen
       vio = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
@@ -288,16 +247,17 @@ export default function PillHero() {
       vio.observe(root);
     }
 
-    /* ---------------- resize: finish running animation, reset pill width ---------------- */
+    /* ---------------- resize ---------------- */
     const onResize = () => {
-      if (!revealed) return; // nothing running yet; initial reveal will use current geometry
-      token++; // cancel any pending close -> open chain
       if (mqPhone.matches !== phone) {
         phone = mqPhone.matches;
         build(); // rebuild keyframes for the new layout (desktop <-> phone)
+        if (!revealed) return; // still waiting for the reveal: stay on the closed "O"
+      } else if (!revealed) {
+        return; // nothing running yet; sizes come from CSS variables
       }
-      jumpToEnd(); // finish the running animation and reset the pill to its final size
-      busy = false;
+      token++; // cancel any pending chain
+      jumpToEnd(); // finish the running animation; the pill lands on its final size
     };
     window.addEventListener("resize", onResize);
 
@@ -312,59 +272,33 @@ export default function PillHero() {
     };
   }, []);
 
-  const { word, nav, footer, media, alt } = pillHero;
+  const { word, media, alt } = pillHero;
 
   return (
-    <section id="pill-hero" className="ph" ref={rootRef} aria-label={`${word.label} — interactive hero`}>
+    <section id="pill-hero" className="ph" ref={rootRef} aria-label={`${word.label} — interactive reveal`}>
       <h2 className="sr-only">{word.label}</h2>
 
-      {/* soft paper background with flowing white lines */}
-      <div className="ph-paper" ref={paperRef} aria-hidden="true">
-        <svg viewBox="0 0 1440 960" preserveAspectRatio="none" focusable="false">
-          {STROKES.map((s, i) => (
-            <path key={i} d={s.d} strokeWidth={s.width} strokeOpacity={s.opacity} />
-          ))}
-        </svg>
-      </div>
-
-      {/* nav (drops in from the top) */}
-      <nav className="ph-nav" ref={navRef} aria-label="Hero navigation">
-        <ul className="ph-nav-left">
-          {nav.left.map((l) => (
-            <li key={l.label}>
-              <a href={l.href}>{l.label}</a>
-            </li>
-          ))}
-        </ul>
-        <ul className="ph-nav-right">
-          {nav.right.map((l) => (
-            <li key={l.label}>
-              <a href={l.href}>{l.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* WORD · pill · WORD */}
+      {/* PR · pill (the "O") · JECTS */}
       <div className="ph-hero" ref={heroRef} role="group" aria-label={word.label}>
-        <span className="ph-part" aria-hidden="true">
+        <span className="ph-part ph-part-l" ref={leftRef} aria-hidden="true">
           {word.left}
         </span>
 
         <div className="ph-pill" ref={pillRef}>
-          <div className="ph-media">
-            <video
-              ref={videoRef}
-              src={media.video}
-              poster={media.poster}
-              muted
-              loop
-              playsInline
-              preload="auto"
-              aria-label={alt.pill}
-            />
+          <div className="ph-window" ref={windowRef}>
+            <div className="ph-media">
+              <video
+                ref={videoRef}
+                src={media.video}
+                poster={media.poster}
+                muted
+                loop
+                playsInline
+                preload="auto"
+                aria-label={alt.pill}
+              />
+            </div>
           </div>
-          <div className="ph-line" ref={lineRef} aria-hidden="true" />
           <div className="ph-icons" ref={iconsRef}>
             {/* breeze */}
             <span className="ph-icon ph-icon-l" aria-hidden="true">
@@ -395,18 +329,9 @@ export default function PillHero() {
           </div>
         </div>
 
-        <span className="ph-part" aria-hidden="true">
+        <span className="ph-part ph-part-r" ref={rightRef} aria-hidden="true">
           {word.right}
         </span>
-      </div>
-
-      {/* footer bar (rises from the bottom) */}
-      <div className="ph-footer" ref={footRef}>
-        <p className="ph-note">{footer.dropCapText}</p>
-        <div className="ph-rule" ref={ruleRef} aria-hidden="true" />
-        <button type="button" className="ph-btn" onClick={() => replayRef.current()}>
-          {footer.button}
-        </button>
       </div>
     </section>
   );

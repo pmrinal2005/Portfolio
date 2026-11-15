@@ -1,33 +1,17 @@
 /**
- * All editable copy for the "pill" reveal hero.
- * The brand word is split in two ("MRI" | "NAL") so the pill opens
- * between the I and the N, exactly like WI | LD in the original brief.
+ * All editable copy for the "pill" reveal section.
+ * The word PROJECTS is split in two ("PR" | "JECTS"): the pill IS the "O" of
+ * PROJECTS. It starts as a bold ring shaped like the letter, then opens up
+ * (widens + thins into a stadium) while the video keeps playing inside it.
  */
 export const pillHero = {
-  word: { left: "MRI", right: "NAL", label: "Mrinal Parida" },
-  nav: {
-    left: [
-      { label: "Home", href: "#hero" },
-      { label: "Skills", href: "#skills" },
-      { label: "Coursework", href: "#coursework" },
-      { label: "Contact", href: "#contact" },
-    ],
-    right: [
-      { label: "Email", href: "mailto:?subject=Hello%20Mrinal" },
-      { label: "Back to top", href: "#hero" },
-    ],
-  },
-  footer: {
-    dropCapText:
-      "Embark on a data-driven journey with Mrinal Parida. Discover the models, pipelines and full-stack builds behind every unforgettable project.",
-    button: "Let's Get Building",
-  },
+  word: { left: "PR", right: "JECTS", label: "Projects" },
   media: {
     video: "/media/pillvideo.mp4",
     poster: "/media/pillimg.PNG",
   },
   alt: {
-    poster: "Still frame from the hero scene video",
-    pill: "Looping hero scene video",
+    poster: "Still frame from the projects scene video",
+    pill: "Looping projects scene video",
   },
 } as const;

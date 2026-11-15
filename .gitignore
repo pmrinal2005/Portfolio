@@ -1,0 +1,22 @@
+# deps
+node_modules/
+
+# next
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env
+.env*.local
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# misc
+.DS_Store
+.vscode/*
+.idea/

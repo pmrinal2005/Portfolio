@@ -27,8 +27,13 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Lenis smooth scroll.
   - Progress is measured inside the section (not window scroll), so it works with the Lenis smooth scroll and the sections above it.
     Rendering pauses while the section is off screen; WebGL failure falls back to static typography; reduced motion disables the easing.
   - All CSS is scoped under `#vante` / `.vt-*` so nothing collides with the existing `.stage`, `footer`, etc. Fonts: Inter Tight + IBM Plex Mono
-    via `next/font/google` (self-hosted at build time).
+    via `next/font/google` (self-hosted at build time). Top/bottom section bars are omitted so the 3x2/2x3 project card grid sits cleanly centered on the dark background.
   - Replace a card by swapping the file in `public/work/` or editing `src/content/vante.ts` (order matters).
+- **FAQ section** (`src/components/FaqSection.tsx`, styles in `src/components/faq.css`, content in `src/content/faq.ts`),
+  placed immediately AFTER the Vante project showcase section and BEFORE the footer (`#faq`):
+  - Near-black (`#090909`) section with static CSS central green glow, top light spill, and five stepped green light bars per side (`430..156u`).
+  - Frosted-glass navigation (collapsing into an accessible drawer on tablet/phone), green-glass `FAQ` tag, Figtree 800 headline, Lexend 300 live search bar, 2x2 pill category cards, and smooth one-at-a-time `0fr -> 1fr` accordion aligned with Mrinal Parida's AI/ML & full-stack portfolio.
+  - Web Animations entrance (~1.9 s) behind `intro-pending` with a 3.8 s failsafe and full `prefers-reduced-motion` support.
 
 ## Media (never removed — replace to change the pill scene)
 Put files in `public/media/` with EXACT names:

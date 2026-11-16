@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import PillHero from "./PillHero";
 import VanteRibbon from "./VanteRibbon";
+import FaqSection from "./FaqSection";
 
 const NAME = "MRINAL PARIDA";
 
@@ -119,7 +120,8 @@ export default function App() {
     const onAnchor = (e: Event) => {
       e.preventDefault();
       const href = (e.currentTarget as HTMLAnchorElement).getAttribute("href")!;
-      lenis.scrollTo(href, { offset: -60 });
+      const flush = href === "#hero" || href === "#pill-hero" || href === "#vante" || href === "#faq";
+      lenis.scrollTo(href, { offset: flush ? 0 : -60 });
     };
     anchors.forEach((a) => a.addEventListener("click", onAnchor));
     cleanups.push(() => {
@@ -147,6 +149,7 @@ export default function App() {
     const hero = heroRef.current!;
     const pillEl = document.getElementById("pill-hero");
     const vanteEl = document.getElementById("vante");
+    const faqEl = document.getElementById("faq");
     const update = () => {
       const y = window.scrollY;
       const vh = window.innerHeight;
@@ -164,8 +167,11 @@ export default function App() {
       cueRef.current!.style.opacity = String(1 - clamp(p * 8));
       const ph = pillEl?.getBoundingClientRect();
       const vr = vanteEl?.getBoundingClientRect();
+      const fq = faqEl?.getBoundingClientRect();
       const pillCoversTop =
-        (!!ph && ph.top <= 56 && ph.bottom > 56) || (!!vr && vr.top <= 56 && vr.bottom > 56);
+        (!!ph && ph.top <= 56 && ph.bottom > 56) ||
+        (!!vr && vr.top <= 56 && vr.bottom > 56) ||
+        (!!fq && fq.top <= 56 && fq.bottom > 56);
       railRef.current!.classList.toggle("on", y > hero.offsetHeight - vh * 0.6 && !pillCoversTop);
       const max = document.documentElement.scrollHeight - vh;
       progRef.current!.style.width = (y / max) * 100 + "%";
@@ -360,8 +366,11 @@ export default function App() {
       {/* Pill reveal hero */}
       <PillHero />
 
-      {/* Vante scroll ribbon (project screenshots) — directly after PROJECTS, before the footer */}
+      {/* Vante scroll ribbon (project screenshots) — directly after PROJECTS */}
       <VanteRibbon />
+
+      {/* FAQ section — directly after Vante project showcase, before the footer */}
+      <FaqSection />
 
       <footer id="contact" style={{ borderTop: "1px solid var(--line)" }}>
         <div className="wrap">

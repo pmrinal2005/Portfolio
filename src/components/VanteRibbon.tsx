@@ -64,7 +64,6 @@ export default function VanteRibbon() {
   const crossRef = useRef<HTMLDivElement>(null);
   const ruleRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-  const pagerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,7 +75,7 @@ export default function VanteRibbon() {
     const cap = capRef.current!;
     const rule = ruleRef.current!;
     const nameEl = nameRef.current!;
-    const introEls = [hintRef.current!, pagerRef.current!, crossRef.current!, glowRef.current!];
+    const introEls = [hintRef.current!, crossRef.current!, glowRef.current!];
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     /* ---------- renderer ---------- */
@@ -411,33 +410,6 @@ export default function VanteRibbon() {
         <div className="vt-hint" ref={hintRef}>
           START A PROJECT &nbsp;→
         </div>
-        <header className="vt-top">
-          <div className="vt-logo">
-            <svg viewBox="0 0 22 18" aria-hidden="true">
-              <path d="M11 0l11 18h-6.200L11 9.600 6.200 18H0z" />
-            </svg>
-            VANTE
-          </div>
-          <div className="vt-pager" ref={pagerRef} aria-hidden="true">
-            <span>←</span>
-            <span>→</span>
-          </div>
-          <nav className="vt-acts" aria-label="Vante quick links">
-            <a href="#contact">
-              <i></i>LET&apos;S TALK
-            </a>
-            <a href="#skills">
-              MENU<b></b>
-            </a>
-          </nav>
-        </header>
-        <footer className="vt-bot">
-          <p>Concepts, explorations and interface experiments shared openly as part of our creative process.</p>
-          <div className="vt-mid">
-            VISUALS<s>/</s>FILM<s>/</s>MUSIC<s>/</s>EXPERIMENTS
-          </div>
-          <div className="vt-r">VIEW SHOWREEL</div>
-        </footer>
         <div className="vt-name" ref={nameRef} aria-hidden="true" />
         {/* accessible list of the work shown on the canvas */}
         <ul style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", margin: -1 }}>

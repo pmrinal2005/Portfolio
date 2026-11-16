@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { IBM_Plex_Mono, Inter_Tight } from "next/font/google";
+import { Figtree, IBM_Plex_Mono, Inter_Tight, Lexend } from "next/font/google";
 import "./globals.css";
 
 /* All fonts are self-hosted (no Google Fonts request at runtime). */
@@ -42,6 +42,21 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+/* FAQ section: Figtree (400/500/600/800) + Lexend (300) self-hosted via next/font. */
+const figtree = Figtree({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "800"],
+  variable: "--font-figtree",
+  display: "swap",
+});
+
+const lexend = Lexend({
+  subsets: ["latin"],
+  weight: ["300"],
+  variable: "--font-lexend",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "MRINAL PARIDA — CS & Data Science | AI, ML & Full-Stack",
   description:
@@ -50,7 +65,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${anton.variable} ${newsreader.variable} ${interTight.variable} ${plexMono.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${anton.variable} ${newsreader.variable} ${interTight.variable} ${plexMono.variable} ${figtree.variable} ${lexend.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

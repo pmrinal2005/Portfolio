@@ -18,16 +18,6 @@ export type FaqItem = {
 };
 
 export const faqContent = {
-  brand: "MRINAL",
-  navLinks: [
-    { label: "Profile", href: "#skills" },
-    { label: "Projects", href: "#vante" },
-    { label: "Coursework", href: "#coursework" },
-    { label: "FAQs", href: "#faq" },
-  ],
-  language: "English",
-  secondaryAction: { label: "Projects", href: "#pill-hero" },
-  primaryAction: { label: "Let's Talk", href: "#contact" },
   hero: {
     tag: "FAQ",
     headline: "Frequently Asked Questions",

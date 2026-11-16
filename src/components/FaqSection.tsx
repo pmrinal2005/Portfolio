@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { faqContent, type FaqCategory } from "@/content/faq";
 import "./faq.css";
 
@@ -46,43 +46,8 @@ function CategoryGlyph({ icon }: { icon: FaqCategory["icon"] }) {
   }
 }
 
-function UsFlagIcon() {
-  const clipId = useId();
-  return (
-    <svg className="fq-flag" viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <clipPath id={clipId}>
-          <circle cx="12" cy="12" r="12" />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${clipId})`}>
-        <rect width="24" height="24" fill="#ffffff" />
-        <rect y="0" width="24" height="2.7" fill="#c8323e" />
-        <rect y="5.4" width="24" height="2.7" fill="#c8323e" />
-        <rect y="10.8" width="24" height="2.7" fill="#c8323e" />
-        <rect y="16.2" width="24" height="2.7" fill="#c8323e" />
-        <rect y="21.3" width="24" height="2.7" fill="#c8323e" />
-        <rect width="12.5" height="13.5" fill="#1e3a78" />
-        <circle cx="3.6" cy="3.6" r="0.85" fill="#ffffff" />
-        <circle cx="6.8" cy="3.6" r="0.85" fill="#ffffff" />
-        <circle cx="10" cy="3.6" r="0.85" fill="#ffffff" />
-        <circle cx="5.2" cy="6.8" r="0.85" fill="#ffffff" />
-        <circle cx="8.4" cy="6.8" r="0.85" fill="#ffffff" />
-        <circle cx="3.6" cy="10" r="0.85" fill="#ffffff" />
-        <circle cx="6.8" cy="10" r="0.85" fill="#ffffff" />
-        <circle cx="10" cy="10" r="0.85" fill="#ffffff" />
-      </g>
-    </svg>
-  );
-}
-
 export default function FaqSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const navWrapRef = useRef<HTMLDivElement>(null);
-  const brandRef = useRef<HTMLAnchorElement>(null);
-  const navPillRef = useRef<HTMLElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
-  const menuBtnRef = useRef<HTMLButtonElement>(null);
   const tagRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const ledeRef = useRef<HTMLParagraphElement>(null);
@@ -93,7 +58,6 @@ export default function FaqSection() {
 
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(faqContent.questions[0]?.id ?? null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [introPending, setIntroPending] = useState(true);
 
   const filteredQuestions = useMemo(() => {
@@ -106,33 +70,7 @@ export default function FaqSection() {
     );
   }, [query]);
 
-  /* Close mobile/tablet drawer on Escape or outside click */
-  useEffect(() => {
-    if (!drawerOpen) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setDrawerOpen(false);
-        menuBtnRef.current?.focus();
-      }
-    };
-
-    const onPointerDown = (e: PointerEvent) => {
-      const wrap = navWrapRef.current;
-      if (wrap && !wrap.contains(e.target as Node)) {
-        setDrawerOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, [drawerOpen]);
-
-  /* One-time Web Animations entrance (~1.9s) behind intro-pending with 3.8s failsafe */
+  /* One-time Web Animations entrance (~1.6s) behind intro-pending with 3.8s failsafe */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -175,44 +113,6 @@ export default function FaqSection() {
         runningAnims.push(anim);
       };
 
-      /* 0-600ms: Brand, links, and actions settle in */
-      animateEl(
-        brandRef.current,
-        [
-          { opacity: 0, transform: "translateY(-10px)" },
-          { opacity: 1, transform: "translateY(0)" },
-        ],
-        0,
-        500
-      );
-      animateEl(
-        navPillRef.current,
-        [
-          { opacity: 0, transform: "translateY(-10px)" },
-          { opacity: 1, transform: "translateY(0)" },
-        ],
-        60,
-        500
-      );
-      animateEl(
-        actionsRef.current,
-        [
-          { opacity: 0, transform: "translateY(-10px)" },
-          { opacity: 1, transform: "translateY(0)" },
-        ],
-        100,
-        500
-      );
-      animateEl(
-        menuBtnRef.current,
-        [
-          { opacity: 0, transform: "translateY(-8px)" },
-          { opacity: 1, transform: "translateY(0)" },
-        ],
-        80,
-        480
-      );
-
       /* FAQ tag lifts and scales in, then headline rises 18u as one block */
       animateEl(
         tagRef.current,
@@ -220,7 +120,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(12px) scale(0.92)" },
           { opacity: 1, transform: "translateY(0) scale(1)" },
         ],
-        300,
+        0,
         480
       );
       animateEl(
@@ -229,7 +129,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(calc(18 * var(--u)))" },
           { opacity: 1, transform: "translateY(0)" },
         ],
-        460,
+        160,
         560
       );
 
@@ -240,7 +140,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(14px)" },
           { opacity: 1, transform: "translateY(0)" },
         ],
-        660,
+        360,
         500
       );
       animateEl(
@@ -249,7 +149,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(12px)" },
           { opacity: 1, transform: "translateY(0)" },
         ],
-        800,
+        500,
         480
       );
 
@@ -260,7 +160,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(16px)" },
           { opacity: 1, transform: "translateY(0)" },
         ],
-        960,
+        660,
         520
       );
 
@@ -271,7 +171,7 @@ export default function FaqSection() {
             { opacity: 0, transform: "translateY(16px)" },
             { opacity: 1, transform: "translateY(0)" },
           ],
-          1140 + idx * 85,
+          840 + idx * 85,
           500
         );
       });
@@ -282,7 +182,7 @@ export default function FaqSection() {
           { opacity: 0, transform: "translateY(14px)" },
           { opacity: 1, transform: "translateY(0)" },
         ],
-        1340,
+        1040,
         550
       );
 
@@ -360,136 +260,6 @@ export default function FaqSection() {
         </div>
         <div className="fq-glow" />
         <div className="fq-spill" />
-      </div>
-
-      {/* Navigation (58u tall, 22u from top) */}
-      <div className="fq-nav-wrap" ref={navWrapRef}>
-        <div className="fq-nav">
-          <a href="#hero" className="fq-brand fq-anim" ref={brandRef}>
-            {/* Angled white "Z" mark (51 x 26u) drawn as one SVG path with slanted ends */}
-            <svg viewBox="0 0 51 26" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M5.5 0H51L48.5 4.8L18.5 20.2H50L45.5 26H0L2.5 21.2L32.5 5.8H1Z"
-              />
-            </svg>
-            <span className="fq-brand-name">{faqContent.brand}</span>
-          </a>
-
-          <div className="fq-nav-pill-pos">
-            <nav className="fq-nav-pill fq-anim" ref={navPillRef} aria-label="FAQ section navigation">
-              {faqContent.navLinks.map((link) => (
-                <a key={link.label} href={link.href} className="fq-nav-link">
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-          </div>
-
-          <div className="fq-actions fq-anim" ref={actionsRef}>
-            <button type="button" className="fq-lang" aria-label="Language: English">
-              <UsFlagIcon />
-              <span>{faqContent.language}</span>
-              <svg
-                className="fq-lang-chevron"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 6l4 4 4-4" />
-              </svg>
-            </button>
-            <a href={faqContent.secondaryAction.href} className="fq-btn-outline">
-              {faqContent.secondaryAction.label}
-            </a>
-            <a href={faqContent.primaryAction.href} className="fq-btn-lime">
-              {faqContent.primaryAction.label}
-            </a>
-          </div>
-
-          <button
-            type="button"
-            className="fq-menu-btn fq-anim"
-            ref={menuBtnRef}
-            aria-expanded={drawerOpen}
-            aria-controls="fq-mobile-drawer"
-            aria-label={drawerOpen ? "Close FAQ menu" : "Open FAQ menu"}
-            onClick={() => setDrawerOpen((prev) => !prev)}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              {drawerOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              )}
-            </svg>
-          </button>
-
-          {/* Tablet & phone collapsible glass drawer */}
-          <div
-            id="fq-mobile-drawer"
-            className={"fq-drawer" + (drawerOpen ? " is-open" : "")}
-            aria-hidden={!drawerOpen}
-          >
-            <nav className="fq-drawer-links" aria-label="FAQ mobile navigation">
-              {faqContent.navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="fq-nav-link"
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className="fq-drawer-actions">
-              <button type="button" className="fq-lang" aria-label="Language: English">
-                <UsFlagIcon />
-                <span>{faqContent.language}</span>
-                <svg
-                  className="fq-lang-chevron"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M4 6l4 4 4-4" />
-                </svg>
-              </button>
-              <a
-                href={faqContent.secondaryAction.href}
-                className="fq-btn-outline"
-                onClick={() => setDrawerOpen(false)}
-              >
-                {faqContent.secondaryAction.label}
-              </a>
-              <a
-                href={faqContent.primaryAction.href}
-                className="fq-btn-lime"
-                onClick={() => setDrawerOpen(false)}
-              >
-                {faqContent.primaryAction.label}
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Centred 1224u content column: Hero + Search + Category Pills + Accordion */}

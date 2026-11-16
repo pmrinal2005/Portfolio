@@ -1,0 +1,309 @@
+/* ==========================================================================
+   PROJECT SHOWCASE (#showcase)
+   Scoped under #showcase and prefixed "sc-" so nothing collides with the
+   existing portfolio styles (.card, .chip, .reveal, ...) in globals.css.
+   Re-uses the site tokens: --bg / --fg / --mute / --line and the Anton +
+   Newsreader font stack, so it reads as part of the same editorial system.
+   ========================================================================== */
+#showcase {
+  --sc-card: #0d0d0c;
+  --sc-card-hi: #121211;
+  --sc-edge: rgba(242, 239, 233, 0.14);
+  --sc-edge-hi: rgba(242, 239, 233, 0.55);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  border-top: 1px solid var(--line);
+  padding: clamp(5rem, 9vw, 8rem) clamp(1rem, 4vw, 2rem) clamp(5rem, 9vw, 9rem);
+}
+
+#showcase *,
+#showcase *::before,
+#showcase *::after {
+  box-sizing: border-box;
+}
+
+/* soft editorial glow behind the grid (static, no animation) */
+#showcase::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(232, 226, 212, 0.07), transparent 70%),
+    radial-gradient(40% 30% at 100% 100%, rgba(232, 226, 212, 0.04), transparent 70%);
+}
+
+/* ---------------- Header ---------------- */
+#showcase .sc-head {
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+  will-change: transform, opacity;
+}
+#showcase .sc-heading {
+  margin: 1.2rem 0 1.6rem;
+  font-size: clamp(3.5rem, 10vw, 10rem);
+  line-height: 0.9;
+  font-weight: 400;
+}
+#showcase .sc-lede {
+  max-width: 60ch;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 300;
+  line-height: 1.5;
+  color: #c9c5bd;
+}
+
+/* ---------------- Grid: 1 / 2 / 3 columns ---------------- */
+#showcase .sc-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 2.2vw, 2rem);
+}
+@media (min-width: 700px) {
+  #showcase .sc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  #showcase .sc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+#showcase .sc-item {
+  display: flex; /* cards stretch to equal row height */
+  min-width: 0;
+  will-change: transform, opacity;
+}
+
+/* ---------------- Card ---------------- */
+#showcase .sc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--sc-card-hi), var(--sc-card));
+  border: 1px solid var(--sc-edge);
+  border-radius: 14px;
+  color: inherit;
+  will-change: transform;
+  transition:
+    border-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#showcase .sc-card:hover,
+#showcase .sc-card:focus-within {
+  border-color: var(--sc-edge-hi);
+  box-shadow:
+    0 22px 50px -22px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(242, 239, 233, 0.06),
+    0 0 42px -10px rgba(232, 226, 212, 0.22);
+}
+#showcase a.sc-card:focus-visible,
+#showcase .sc-link:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+/* ---------------- Image viewport (fixed ratio → zero layout shift) ---------------- */
+#showcase .sc-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #151514;
+  border-bottom: 1px solid var(--sc-edge);
+}
+#showcase .sc-media-zoom {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  transform-origin: center;
+}
+#showcase .sc-img {
+  object-fit: cover;
+  object-position: center top;
+}
+#showcase .sc-media-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(7, 7, 7, 0.35), transparent 35%, transparent 60%, rgba(7, 7, 7, 0.55));
+}
+#showcase .sc-num {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.9rem;
+  padding: 0.3rem 0.65rem;
+  color: var(--fg);
+  background: rgba(7, 7, 7, 0.62);
+  border: 1px solid var(--sc-edge);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------------- Text body ---------------- */
+#showcase .sc-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: clamp(1.1rem, 2vw, 1.6rem);
+}
+#showcase .sc-kind {
+  margin-bottom: 0.9rem;
+}
+#showcase .sc-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  line-height: 1.05;
+}
+#showcase .sc-title-text {
+  display: inline-block;
+  will-change: transform;
+}
+#showcase .sc-title-arrow {
+  display: inline-block;
+  color: var(--mute);
+  will-change: transform, opacity;
+}
+
+/* accent indicator that draws in on hover */
+#showcase .sc-rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 1rem 0 1.1rem;
+  background: var(--fg);
+  transform-origin: left center;
+  will-change: transform;
+}
+#showcase .sc-rule-static {
+  background: var(--sc-edge);
+  transform: none;
+}
+#showcase .sc-desc {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: #c9c5bd;
+}
+
+/* ---------------- Tags + actions ---------------- */
+#showcase .sc-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: auto 0 0;
+  padding: 1.3rem 0 0;
+}
+#showcase .sc-tag {
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--sc-edge);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 300;
+  color: #b9b5ad;
+  transition: border-color 0.4s, color 0.4s;
+}
+#showcase .sc-card:hover .sc-tag,
+#showcase .sc-card:focus-within .sc-tag {
+  border-color: rgba(242, 239, 233, 0.32);
+  color: var(--fg);
+}
+
+#showcase .sc-actions {
+  display: flex;
+  gap: 1.4rem;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sc-edge);
+  /* revealed on hover with opacity/transform only; always visible on touch + keyboard */
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#showcase .sc-card:hover .sc-actions,
+#showcase .sc-card:focus-within .sc-actions {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  #showcase .sc-actions {
+    opacity: 1;
+    transform: none;
+  }
+}
+#showcase .sc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-newsreader), serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.35s, color 0.35s;
+}
+#showcase .sc-link:hover {
+  border-bottom-color: var(--fg);
+}
+
+/* ---------------- "More" tile ---------------- */
+#showcase .sc-more {
+  justify-content: space-between;
+  gap: 0.2rem;
+  padding: clamp(1.4rem, 2.4vw, 2rem);
+  min-height: 320px;
+  text-decoration: none;
+  background:
+    radial-gradient(90% 70% at 0% 0%, rgba(232, 226, 212, 0.09), transparent 65%),
+    linear-gradient(180deg, var(--sc-card-hi), var(--sc-card));
+  border-style: dashed;
+}
+#showcase .sc-more-title {
+  display: block;
+  margin-top: 1.2rem;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  line-height: 0.98;
+}
+#showcase .sc-more .sc-rule-static {
+  margin: 1.2rem 0;
+}
+#showcase .sc-more-cta {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 1.6rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  will-change: transform;
+}
+
+/* ---------------- Reduced motion: no transform-based flourish ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  #showcase .sc-actions {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  #showcase .sc-card {
+    transition: border-color 0.2s;
+  }
+}

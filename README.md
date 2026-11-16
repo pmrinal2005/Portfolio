@@ -35,6 +35,14 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Lenis smooth scroll.
   - No navbar inside the FAQ section (the global site navigation remains untouched) — green-glass `FAQ` tag, Figtree 800 headline, Lexend 300 live search bar, 2x2 pill category cards, and smooth one-at-a-time `0fr -> 1fr` accordion aligned with Mrinal Parida's AI/ML & full-stack portfolio.
   - Web Animations entrance (~1.9 s) behind `intro-pending` with a 3.8 s failsafe and full `prefers-reduced-motion` support.
 
+- **Animated Project Showcase** (`src/components/ShowcaseSection.tsx`, styles in `src/components/showcase.css`, content in `src/content/showcase.ts`),
+  placed immediately BELOW the Vante "Craft in Motion" ribbon and immediately ABOVE the FAQ (`#showcase`):
+  - 8 cards built from the preview images in `/public/work` (`img1`-`img8`) plus a closing "More builds on GitHub" tile; copy comes from the matching repos on github.com/pmrinal2005 (StillMe, LokMitra, COMPASS, SCOUTT, BLOOM).
+  - Responsive grid: 1 column (mobile) / 2 (>=700px) / 3 (>=1100px). Images sit in a fixed `aspect-[16/10]` `object-cover` viewport (zero layout shift).
+  - Framer Motion: section fade + rise on scroll (`whileInView`, `once`, `amount: 0.2`), cards cascade with a 0.1s stagger per visible row, hover = lift `y:-6`, image zoom `scale:1.05`, title nudge + accent line draw, tech tags and Live/Repo links (always visible on touch and on keyboard focus).
+  - Only `transform`/`opacity` are animated; `prefers-reduced-motion` switches to opacity-only fades with no lift/zoom/slide.
+  - To edit a project, change only `src/content/showcase.ts`.
+
 ## Media (never removed — replace to change the pill scene)
 Put files in `public/media/` with EXACT names:
 - `pillvideo.mp4`  (looping, muted video)

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import PillHero from "./PillHero";
 import VanteRibbon from "./VanteRibbon";
+import ShowcaseSection from "./ShowcaseSection";
 import FaqSection from "./FaqSection";
 
 const NAME = "MRINAL PARIDA";
@@ -369,7 +370,10 @@ export default function App() {
       {/* Vante scroll ribbon (project screenshots) — directly after PROJECTS */}
       <VanteRibbon />
 
-      {/* FAQ section — directly after Vante project showcase, before the footer */}
+      {/* Animated Project Showcase — directly above FAQ, below the Vante "Craft in Motion" ribbon */}
+      <ShowcaseSection />
+
+      {/* FAQ section — directly after the Project Showcase, before the footer */}
       <FaqSection />
 
       <footer id="contact" style={{ borderTop: "1px solid var(--line)" }}>

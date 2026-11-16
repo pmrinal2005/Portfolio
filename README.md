@@ -17,6 +17,18 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Lenis smooth scroll.
   - Reduced motion shows the final open state with the video paused on the poster.
   - Recording mode: `/?rec=1`.
 - Copy for the section lives in `src/content/pillHero.ts`.
+- **Vante ribbon section** (`src/components/VanteRibbon.tsx`, styles in `src/components/vante.css`, content in `src/content/vante.ts`),
+  placed immediately AFTER the PROJECTS pill section and BEFORE the footer (`#vante`):
+  - Scroll-driven three.js (0.170.0) hero. `CRAFT IN` / `MOTION` slide across in opposite directions while a ribbon of cards spirals
+    along a fixed 3D rail (shallow ~5.4-7.6 unit near arc, far runs up to 24 units), then the cards land one by one in a 3x2 grid
+    (2x3 below aspect .9). Everything derives from one smoothed progress value, so scrolling back reverses it exactly.
+  - Cards are the 8 project screenshots in `public/work/img1..img8.png` (first six land in the grid, last two only appear in the ribbon).
+    The fragment shader flips `uv.x` on back faces, so images are never mirrored. Hovering a grid card shows a name pill.
+  - Progress is measured inside the section (not window scroll), so it works with the Lenis smooth scroll and the sections above it.
+    Rendering pauses while the section is off screen; WebGL failure falls back to static typography; reduced motion disables the easing.
+  - All CSS is scoped under `#vante` / `.vt-*` so nothing collides with the existing `.stage`, `footer`, etc. Fonts: Inter Tight + IBM Plex Mono
+    via `next/font/google` (self-hosted at build time).
+  - Replace a card by swapping the file in `public/work/` or editing `src/content/vante.ts` (order matters).
 
 ## Media (never removed — replace to change the pill scene)
 Put files in `public/media/` with EXACT names:
@@ -24,7 +36,7 @@ Put files in `public/media/` with EXACT names:
 - `pillimg.PNG`    (poster / first frame; note the capital PNG)
 
 ## Fonts
-Self-hosted in `src/app/fonts/` (Inter variable 400–800, Anton, Newsreader) via `next/font/local`.
+Self-hosted in `src/app/fonts/` (Inter variable 400–800, Anton, Newsreader) via `next/font/local`; Inter Tight and IBM Plex Mono via `next/font/google` (fetched at build time).
 
 ## Run
 ```bash
@@ -36,7 +48,7 @@ Sandbox: `pm2 start ecosystem.config.cjs` (after `npm run build`).
 
 ## Deploy to Vercel
 `vercel.json` pins the Next.js framework preset, install/build commands, long-lived caching for `/media/*`
-(range requests enabled for the video) and basic security headers. Import the repo in Vercel — no extra settings needed
+(range requests enabled for the video), long-lived caching for `/work/*` (Vante screenshots) and basic security headers. Import the repo in Vercel — no extra settings needed
 (Node >= 20.9, set in `package.json` `engines`).
 
 ## Not implemented / next steps

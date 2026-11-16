@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import PillHero from "./PillHero";
+import VanteRibbon from "./VanteRibbon";
 
 const NAME = "MRINAL PARIDA";
 
@@ -145,6 +146,7 @@ export default function App() {
     /* Scroll-driven hero */
     const hero = heroRef.current!;
     const pillEl = document.getElementById("pill-hero");
+    const vanteEl = document.getElementById("vante");
     const update = () => {
       const y = window.scrollY;
       const vh = window.innerHeight;
@@ -161,7 +163,9 @@ export default function App() {
       subRef.current!.style.transform = `translateY(${(1 - c) * 30}px)`;
       cueRef.current!.style.opacity = String(1 - clamp(p * 8));
       const ph = pillEl?.getBoundingClientRect();
-      const pillCoversTop = !!ph && ph.top <= 56 && ph.bottom > 56;
+      const vr = vanteEl?.getBoundingClientRect();
+      const pillCoversTop =
+        (!!ph && ph.top <= 56 && ph.bottom > 56) || (!!vr && vr.top <= 56 && vr.bottom > 56);
       railRef.current!.classList.toggle("on", y > hero.offsetHeight - vh * 0.6 && !pillCoversTop);
       const max = document.documentElement.scrollHeight - vh;
       progRef.current!.style.width = (y / max) * 100 + "%";
@@ -355,6 +359,9 @@ export default function App() {
 
       {/* Pill reveal hero */}
       <PillHero />
+
+      {/* Vante scroll ribbon (project screenshots) — directly after PROJECTS, before the footer */}
+      <VanteRibbon />
 
       <footer id="contact" style={{ borderTop: "1px solid var(--line)" }}>
         <div className="wrap">

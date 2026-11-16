@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { IBM_Plex_Mono, Inter_Tight } from "next/font/google";
 import "./globals.css";
 
 /* All fonts are self-hosted (no Google Fonts request at runtime). */
@@ -26,6 +27,21 @@ const newsreader = localFont({
   display: "swap",
 });
 
+/* Vante ribbon section: Inter Tight + IBM Plex Mono (downloaded at build time and self-hosted by next/font). */
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter-tight",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "MRINAL PARIDA — CS & Data Science | AI, ML & Full-Stack",
   description:
@@ -34,7 +50,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${anton.variable} ${newsreader.variable}`}>
+    <html lang="en" className={`${inter.variable} ${anton.variable} ${newsreader.variable} ${interTight.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
